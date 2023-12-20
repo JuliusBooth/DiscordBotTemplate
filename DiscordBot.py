@@ -28,6 +28,26 @@ async def on_ready():
         repeated_task.start()
     print(f'{bot.user.name} has connected to Discord!')
 
+# Event handler for processing incoming messages
+# Message events are handled before command events
+@bot.event
+async def on_message(message):
+    # Ignore messages from the bot itself
+    if message.author == bot.user:
+        return
+    # Respond to a specific message
+    if message.content == 'ping':
+        await message.channel.send('pong')
+    # Process all commands. Without this, commands will not be processed
+    await bot.process_commands(message)
+
+# Invoked with /repeat <args>
+@bot.command(pass_context=True, name='repeat')
+async def repeat(ctx, *, args=None):
+    message = "".join(args)
+    await ctx.send(message)
+
+
 CHANNEL_ID = None # Placeholder for the Discord channel ID
 TIMED_TASK_FREQUENCY = 30  # Frequency of the repeated task in seconds
 
@@ -55,23 +75,5 @@ async def before():
     await bot.wait_until_ready()
     print("Finished waiting") 
 
-# Event handler for processing incoming messages
-# Message events are handled before command events
-@bot.event
-async def on_message(message):
-    # Ignore messages from the bot itself
-    if message.author == bot.user:
-        return
-    # Respond to a specific message
-    if message.content == 'ping':
-        await message.channel.send('pong')
-    # Process all commands. Without this, commands will not be processed
-    await bot.process_commands(message)
-
-# Invoked with /repeat <args>
-@bot.command(pass_context=True, name='repeat')
-async def repeat(ctx, *, args=None):
-    message = "".join(args)
-    await ctx.send(message)
 
 bot.run(DISCORD_TOKEN)
